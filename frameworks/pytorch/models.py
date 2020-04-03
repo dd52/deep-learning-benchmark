@@ -14,9 +14,11 @@ class pytorch_base:
         self.model = getattr(torchvision.models, model_name)().cuda() if precision == 'fp32' \
             else getattr(torchvision.models, model_name)().cuda().half()
         x = torch.rand(batch_size, 3, image_shape[0], image_shape[1])
-        self.eval_input = torch.autograd.Variable(x, volatile=True).cuda() if precision == 'fp32' \
-            else torch.autograd.Variable(x, volatile=True).cuda().half()
-        self.train_input = torch.autograd.Variable(x, requires_grad=True).cuda() if precision == 'fp32' \
+        with torch.no_grad():
+           self.eval_input = torch.autograd.Variable(x).cuda() if precision == 'fp32' \
+            else torch.autograd.Variable(x).cuda().half()
+        with torch.no_grad():
+           self.train_input = torch.autograd.Variable(x, requires_grad=True).cuda() if precision == 'fp32' \
             else torch.autograd.Variable(x, requires_grad=True).cuda().half()
 
     def eval(self, num_iterations, num_warmups):
